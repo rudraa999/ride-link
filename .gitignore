@@ -1,0 +1,66 @@
+# ==============================
+# OS Generated Files
+# ==============================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==============================
+# Secrets & Environment Files
+# ==============================
+.env
+.env.*
+*.env
+!.env.example
+!frontend/.env.example
+.vscode/launch.json
+!.vscode/launch.json.example
+
+# ==============================
+# IDE & Editor Files
+# ==============================
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json.example
+
+# ==============================
+# Java & Maven Build Outputs
+# ==============================
+target/
+**/target/
+*.class
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# ==============================
+# Frontend & Node.js Outputs
+# ==============================
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+.vite/
+**/.vite/
+*.local
+
+# ==============================
+# Logs & Diagnostic Files
+# ==============================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*

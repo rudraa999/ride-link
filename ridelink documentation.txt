@@ -1,0 +1,116 @@
+RIDELINK---------------------------------------------------------
+RideLink is a college-focused ride-sharing platform that helps students find and connect with other students traveling toward the same or nearby destinations after college.
+
+For example, if a student is heading toward Viman Nagar, they can open the RideLink web app and click “I’m Available”, specifying their destination and approximate departure time. Other students from the college can then see that they are available and heading toward that area.
+
+At the same time, the student can view a list of other available students traveling toward the same or similar destination and send a ride request to connect with them.
+Availability Rules
+If a ride request is successfully accepted:
+→ The matched students are automatically marked unavailable so they don't receive additional ride requests.
+If the student doesn't find a match:
+→ Their availability automatically expires after 60 minutes.
+Student can also manually turn off availability at any time.
+
+This gives RideLink a simple and clear concept:
+
+Discover → Request → Accept → Match → Chat
+
+-------------------- product requirement document - technical requirement document - ui ux design - backend schema --------------------
+
+PRODUCT REQUIREMENT DOCUMENT — RideLink ---------------------
+
+1. User Registration & Login
+Students can register and log in securely.
+During registration, students select their college/campus from a predefined list of Pune colleges.  (in colleges table i have stored all predefined college allow user to search and select only from it).
+The selected campus is saved as their default departure campus.
+
+2. Active Departure Campus
+Students can change their active departure campus from Profile/Settings.
+The active campus is used as the starting point for ride matching.
+
+3. Ride Availability
+Students can turn availability ON/OFF.
+When availability is OFF, the dashboard should not show active ride-matching information.
+When availability is ON, the dashboard updates without a page reload.
+Students provide:
+Destination
+Approximate departure time
+
+4. Destination Selection
+Students can search and select their destination using an interactive map.
+Geoapify is used for destination search and coordinates.
+Leaflet + OpenStreetMap is used to display the map.
+The system stores:
+Destination name
+Latitude
+Longitude
+
+5. Ride Matching
+Students can discover other available students based on:
+Same or nearby departure campus.
+Compatible departure time.
+Destination within 1 km.
+The backend calculates the destination distance using the Haversine formula based on stored latitude and longitude.
+
+6. Ride Requests
+Students can send ride requests to suitable students.
+Recipients can Accept or Reject requests.
+When a request is accepted:
+A ride match is automatically created.
+Both students' availability is turned OFF.
+They no longer appear as available for new matches.
+Chat becomes available.
+
+7. Availability Expiration
+Availability automatically expires after 60 minutes if no ride match is created.
+Students can also manually turn availability OFF.
+
+8. In-App Chat
+Chat is available only after a ride request is accepted.
+Matched students can communicate in real time.
+Chat messages are stored in the database.
+
+9. Match History
+Every created ride match is stored in the database.
+Students can view their previous matches in Match History.
+Match history can show:
+Other student
+Departure campus
+Destination
+Departure time
+Match date
+Match status
+
+10. profile photo 
+using cloudinary ,users to set profile photo from thier profile section seting
+
+---------------------------------------------------------------------------------------------------------
+
+Technology Stack  --------------
+
+Frontend: React.js
+Map: Leaflet + React-Leaflet
+Map Data: OpenStreetMap
+Location Search: Geoapify API (key----"   xyzzz   ")
+Backend: Java + Spring Boot
+profile photos: cloudinary (api : " ")
+Real-Time Communication: WebSocket + STOMP
+Database: MySQL username: root and password : root ( db name- rideshare)
+Build Tool: Maven
+Distance Calculation: Haversine Formula
+Security: Spring Security + JWT
+Session Management: Stateless JWT authentication
+Access Token: Short-lived JWT
+Refresh Token: Persistent HttpOnly + Secure cookie
+Refresh Token Storage: Browser cookie; no DB storage required for the MVP
+
+
+--------------------------------------------------------------------------------------------
+
+note: 
+in frontend folder keep frontend 
+in backend folder keep backend stuff
+in database rideshare i have inserted one table already for list of colleges with table name "colleges(id, name, city)" fetch colleges name from there.
+
+
+

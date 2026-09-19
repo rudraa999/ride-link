@@ -1,0 +1,55 @@
+package com.ridelink.config;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Configuration
+public class CloudinaryConfig {
+
+    private static final Pattern CLOUDINARY_URL_PATTERN = Pattern.compile("^cloudinary://([^:]+):([^@]+)@(.+)$");
+
+    @Value("${cloudinary.url:${CLOUDINARY_URL:}}")
+    private String cloudinaryUrl;
+
+    @Value("${cloudinary.cloud-name:}")
+    private String cloudName;
+
+    @Value("${cloudinary.api-key:}")
+    private String apiKey;
+
+    @Value("${cloudinary.api-secret:}")
+    private String apiSecret;
+
+    @Bean
+    public Cloudinary cloudinary() {
+        if (cloudinaryUrl != null && !cloudinaryUrl.trim().isEmpty()) {
+            String cleanUrl = cloudinaryUrl.replace("CLOUDINARY_URL=", "").trim();
+            Matcher matcher = CLOUDINARY_URL_PATTERN.matcher(cleanUrl);
+            if (matcher.find()) {
+                String parsedApiKey = matcher.group(1);
+                String parsedApiSecret = matcher.group(2);
+                String parsedCloudName = matcher.group(3);
+
+                return new Cloudinary(ObjectUtils.asMap(
+                        "cloud_name", parsedCloudName,
+                        "api_key", parsedApiKey,
+                        "api_secret", parsedApiSecret,
+                        "secure", true
+                ));
+            }
+        }
+
+        return new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret,
+                "secure", true
+        ));
+    }
+}
