@@ -1,0 +1,11 @@
+# target and maven build artifacts
+target/
+.mvn/wrapper/maven-wrapper.jar
+*.log
+
+# Git & IDE files
+.git/
+.gitignore
+.vscode/
+.idea/
+*.iml

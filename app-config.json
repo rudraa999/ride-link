@@ -1,0 +1,12 @@
+{
+  "stack": "docker",
+  "command": "java $JAVA_OPTS -Dserver.port=$X_ZOHO_CATALYST_LISTEN_PORT -jar app.jar",
+  "env_variables": {
+    "DB_URL": "",
+    "DB_USERNAME": "",
+    "DB_PASSWORD": "",
+    "JWT_SECRET": "",
+    "CLOUDINARY_URL": "",
+    "GEOAPIFY_API_KEY": ""
+  }
+}

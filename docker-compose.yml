@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: ridelink-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-rideshare}
+      MYSQL_USER: ${DB_USERNAME:-rideuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-ridepass123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ridelink-net
+
+  # Spring Boot Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ridelink-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:-rideshare}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: ${DB_USERNAME:-rideuser}
+      DB_PASSWORD: ${DB_PASSWORD:-ridepass123}
+      JWT_SECRET: ${JWT_SECRET:-9a7e8f5b4c3d2e1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a}
+      CLOUDINARY_URL: ${CLOUDINARY_URL:-cloudinary://your_key:your_secret@your_cloud_name}
+      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-794f89ddf1fa4eb7b2fa9c0613412657}
+    ports:
+      - "8080:8080"
+    networks:
+      - ridelink-net
+
+  # React + Vite Frontend (Nginx Reverse Proxy)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-794f89ddf1fa4eb7b2fa9c0613412657}
+    container_name: ridelink-frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      PORT: 80
+      BACKEND_URL: http://backend:8080
+    ports:
+      - "3000:80"
+    networks:
+      - ridelink-net
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  ridelink-net:
+    driver: bridge
