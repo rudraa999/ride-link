@@ -12,7 +12,7 @@ COPY frontend/package*.json ./
 RUN npm ci || npm install
 
 COPY frontend/ ./
-ARG VITE_GEOAPIFY_API_KEY=794f89ddf1fa4eb7b2fa9c0613412657
+ARG VITE_GEOAPIFY_API_KEY=
 ENV VITE_GEOAPIFY_API_KEY=$VITE_GEOAPIFY_API_KEY
 RUN npm run build
 

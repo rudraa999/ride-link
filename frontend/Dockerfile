@@ -15,7 +15,7 @@ RUN npm ci || npm install
 COPY . .
 
 # Build argument for Geoapify API Key (optional during build)
-ARG VITE_GEOAPIFY_API_KEY=794f89ddf1fa4eb7b2fa9c0613412657
+ARG VITE_GEOAPIFY_API_KEY=
 ENV VITE_GEOAPIFY_API_KEY=$VITE_GEOAPIFY_API_KEY
 
 # Build production bundle

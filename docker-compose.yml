@@ -7,16 +7,16 @@ services:
     container_name: ridelink-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-change_me_root_password}
       MYSQL_DATABASE: ${DB_NAME:-rideshare}
-      MYSQL_USER: ${DB_USERNAME:-rideuser}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-ridepass123}
+      MYSQL_USER: ${DB_USERNAME:-change_me_db_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-change_me_db_password}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-change_me_root_password}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,11 +36,11 @@ services:
         condition: service_healthy
     environment:
       DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:-rideshare}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      DB_USERNAME: ${DB_USERNAME:-rideuser}
-      DB_PASSWORD: ${DB_PASSWORD:-ridepass123}
-      JWT_SECRET: ${JWT_SECRET:-9a7e8f5b4c3d2e1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a}
+      DB_USERNAME: ${DB_USERNAME:-change_me_db_user}
+      DB_PASSWORD: ${DB_PASSWORD:-change_me_db_password}
+      JWT_SECRET: ${JWT_SECRET:-change_me_to_a_long_random_secret}
       CLOUDINARY_URL: ${CLOUDINARY_URL:-cloudinary://your_key:your_secret@your_cloud_name}
-      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-794f89ddf1fa4eb7b2fa9c0613412657}
+      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-your_geoapify_api_key}
     ports:
       - "8080:8080"
     networks:
@@ -52,7 +52,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-794f89ddf1fa4eb7b2fa9c0613412657}
+        VITE_GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-}
     container_name: ridelink-frontend
     restart: always
     depends_on:
