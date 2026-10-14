@@ -1,3 +1,9 @@
+# Environment and secrets (CRITICAL: Never include in image builds)
+.env
+.env.*
+!.env.example
+!.env.aws.example
+
 # Maven & Java
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
@@ -6,9 +12,12 @@ backend/.mvn/wrapper/maven-wrapper.jar
 # Node & Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/.cache/
 
 # Git & IDE
 .git/
 .gitignore
+.gitattributes
 .vscode/
 .idea/
+*.iml

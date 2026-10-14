@@ -1,74 +1,34 @@
 version: '3.8'
 
 services:
-  # MySQL Database Service
-  mysql:
-    image: mysql:8.0
-    container_name: ridelink-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-change_me_root_password}
-      MYSQL_DATABASE: ${DB_NAME:-rideshare}
-      MYSQL_USER: ${DB_USERNAME:-change_me_db_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-change_me_db_password}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-change_me_root_password}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - ridelink-net
-
-  # Spring Boot Backend Service
-  backend:
+  # RideLink Unified Fullstack App (React Frontend + Spring Boot Backend)
+  app:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: ridelink-backend
-    restart: always
-    depends_on:
-      mysql:
-        condition: service_healthy
-    environment:
-      DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:-rideshare}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      DB_USERNAME: ${DB_USERNAME:-change_me_db_user}
-      DB_PASSWORD: ${DB_PASSWORD:-change_me_db_password}
-      JWT_SECRET: ${JWT_SECRET:-change_me_to_a_long_random_secret}
-      CLOUDINARY_URL: ${CLOUDINARY_URL:-cloudinary://your_key:your_secret@your_cloud_name}
-      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-your_geoapify_api_key}
-    ports:
-      - "8080:8080"
-    networks:
-      - ridelink-net
-
-  # React + Vite Frontend (Nginx Reverse Proxy)
-  frontend:
-    build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile
       args:
         VITE_GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-}
-    container_name: ridelink-frontend
-    restart: always
-    depends_on:
-      - backend
-    environment:
-      PORT: 80
-      BACKEND_URL: http://backend:8080
+    container_name: ridelink-app
+    restart: unless-stopped
     ports:
-      - "3000:80"
-    networks:
-      - ridelink-net
-
-volumes:
-  mysql_data:
-    driver: local
-
-networks:
-  ridelink-net:
-    driver: bridge
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      # AWS RDS MySQL Configuration (set in your .env)
+      DB_HOST: ${DB_HOST:-}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-rideshare}
+      DB_USERNAME: ${DB_USERNAME:-}
+      DB_PASSWORD: ${DB_PASSWORD:-}
+      DB_URL: ${DB_URL:-}
+      DB_USE_SSL: ${DB_USE_SSL:-false}
+      # Application Secrets
+      JWT_SECRET: ${JWT_SECRET:-}
+      CLOUDINARY_URL: ${CLOUDINARY_URL:-}
+      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
