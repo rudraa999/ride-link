@@ -1,5 +1,6 @@
 package com.ridelink.model;
 
+import com.ridelink.security.ChatEncryptionConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,6 +32,7 @@ public class ChatMessage {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
+    @Convert(converter = ChatEncryptionConverter.class)
     @Column(nullable = false, length = 2000)
     private String content;
 

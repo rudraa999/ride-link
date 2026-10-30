@@ -1,14 +1,19 @@
 package com.ridelink.config;
 
 import com.ridelink.model.College;
+import com.ridelink.model.User;
 import com.ridelink.repository.CollegeRepository;
 import com.ridelink.repository.UserRepository;
+import com.ridelink.security.ChatEncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -17,11 +22,68 @@ public class DataInitializer implements CommandLineRunner {
 
     private final CollegeRepository collegeRepository;
     private final UserRepository userRepository;
+    private final JdbcTemplate jdbcTemplate;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
         seedColleges();
+        seedAdminUser();
         backfillPrivacySettings();
+        backfillChatEncryption();
+    }
+
+    private void seedAdminUser() {
+        Optional<User> existingAdmin = userRepository.findByIdentifier("admin");
+        if (existingAdmin.isEmpty()) {
+            User admin = User.builder()
+                    .fullName("Platform Administrator")
+                    .email("admin@ridelink.com")
+                    .password(passwordEncoder.encode("admin123"))
+                    .college("RideLink Central Administration")
+                    .activeCampus("HQ Operations")
+                    .phone("+1-800-RIDELINK")
+                    .role("ROLE_ADMIN")
+                    .showProfile(true)
+                    .showPhonePostMatch(true)
+                    .showPreciseDistance(true)
+                    .showRideStats(true)
+                    .build();
+            userRepository.save(admin);
+            log.info("Default Admin account seeded: username: 'admin' / email: 'admin@ridelink.com' / pass: 'admin123'");
+        } else {
+            User admin = existingAdmin.get();
+            boolean updated = false;
+            if (!"ROLE_ADMIN".equals(admin.getRole())) {
+                admin.setRole("ROLE_ADMIN");
+                updated = true;
+            }
+            if (updated) {
+                userRepository.save(admin);
+                log.info("Updated existing admin user account to ROLE_ADMIN");
+            }
+        }
+    }
+
+    private void backfillChatEncryption() {
+        try {
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT id, content FROM chat_messages");
+            int encryptedCount = 0;
+            for (Map<String, Object> row : rows) {
+                Long id = ((Number) row.get("id")).longValue();
+                String rawContent = (String) row.get("content");
+                if (rawContent != null && !ChatEncryptionUtil.isEncrypted(rawContent)) {
+                    String cipherText = ChatEncryptionUtil.encrypt(rawContent);
+                    jdbcTemplate.update("UPDATE chat_messages SET content = ? WHERE id = ?", cipherText, id);
+                    encryptedCount++;
+                }
+            }
+            if (encryptedCount > 0) {
+                log.info("Successfully encrypted {} legacy plain-text chat message(s) in database", encryptedCount);
+            }
+        } catch (Exception e) {
+            log.warn("Chat messages encryption backfill skipped or failed: {}", e.getMessage());
+        }
     }
 
     private void backfillPrivacySettings() {

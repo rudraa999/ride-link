@@ -21,11 +21,15 @@ public class UserPrincipal implements UserDetails {
     private User user;
 
     public static UserPrincipal create(User user) {
+        String role = user.getRole() != null ? user.getRole() : "ROLE_USER";
+        if (!role.startsWith("ROLE_")) {
+            role = "ROLE_" + role;
+        }
         return new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
+                Collections.singletonList(new SimpleGrantedAuthority(role)),
                 user
         );
     }

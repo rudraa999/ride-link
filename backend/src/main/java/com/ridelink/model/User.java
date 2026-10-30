@@ -43,6 +43,10 @@ public class User {
 
     @Builder.Default
     @Column(nullable = false)
+    private String role = "ROLE_USER";
+
+    @Builder.Default
+    @Column(nullable = false)
     private Boolean showProfile = true;
 
     @Builder.Default

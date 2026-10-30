@@ -29,4 +29,8 @@ public interface RideAvailabilityRepository extends JpaRepository<RideAvailabili
     @Modifying
     @Query("UPDATE RideAvailability r SET r.isActive = false WHERE r.isActive = true AND r.expiresAt <= :now")
     int deactivateExpired(@Param("now") LocalDateTime now);
+
+    long countByIsActiveTrue();
+
+    List<RideAvailability> findAllByOrderByCreatedAtDesc();
 }

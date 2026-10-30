@@ -22,4 +22,6 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
 
     @Query("SELECT r FROM RideRequest r WHERE r.sender = :sender AND r.receiver = :receiver AND r.status = 'PENDING'")
     Optional<RideRequest> findPendingRequest(@Param("sender") User sender, @Param("receiver") User receiver);
+
+    long countByStatus(RideRequest.RequestStatus status);
 }

@@ -18,6 +18,7 @@ public class UserDto {
     private String activeCampus;
     private String phone;
     private String profileImageUrl;
+    private String role;
     private Boolean showProfile;
     private Boolean showPhonePostMatch;
     private Boolean showPreciseDistance;
@@ -33,6 +34,7 @@ public class UserDto {
                 .activeCampus(user.getActiveCampus())
                 .phone(user.getPhone())
                 .profileImageUrl(user.getProfileImageUrl())
+                .role(user.getRole() != null ? user.getRole() : "ROLE_USER")
                 .showProfile(user.getShowProfile() != null ? user.getShowProfile() : true)
                 .showPhonePostMatch(user.getShowPhonePostMatch() != null ? user.getShowPhonePostMatch() : true)
                 .showPreciseDistance(user.getShowPreciseDistance() != null ? user.getShowPreciseDistance() : true)

@@ -24,4 +24,8 @@ public interface RideMatchRepository extends JpaRepository<RideMatch, Long> {
 
     @Query("SELECT m FROM RideMatch m WHERE m.id = :matchId AND (m.student1 = :user OR m.student2 = :user)")
     Optional<RideMatch> findByIdAndUser(@Param("matchId") Long matchId, @Param("user") User user);
+
+    long countByStatus(RideMatch.MatchStatus status);
+
+    List<RideMatch> findAllByOrderByCreatedAtDesc();
 }

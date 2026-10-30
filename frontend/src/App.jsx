@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
 import Sidebar from './components/Sidebar';
@@ -9,14 +9,21 @@ import Dashboard from './pages/Dashboard';
 import Chats from './pages/Chats';
 import MatchHistory from './pages/MatchHistory';
 import ProfileSettings from './pages/ProfileSettings';
+import AdminPanel from './pages/AdminPanel';
 
 function MainApp() {
   const { user, loading } = useAuth();
   const { incomingRequest, activeMatchNotification, clearMatchNotification } = useSocket();
   const [authView, setAuthView] = useState('login'); // 'login' | 'signup'
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'find_rides' | 'chats' | 'history' | 'profile' | 'settings'
+  const [activeTab, setActiveTab] = useState(() => (user?.role === 'ROLE_ADMIN' ? 'admin' : 'home'));
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeChatMatchId, setActiveChatMatchId] = useState(null);
+
+  useEffect(() => {
+    if (user?.role === 'ROLE_ADMIN' && activeTab === 'home') {
+      setActiveTab('admin');
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -80,6 +87,13 @@ function MainApp() {
 
         {(activeTab === 'profile' || activeTab === 'settings') && (
           <ProfileSettings
+            setActiveTab={setActiveTab}
+            onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+          />
+        )}
+
+        {activeTab === 'admin' && (
+          <AdminPanel
             setActiveTab={setActiveTab}
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           />
