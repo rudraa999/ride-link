@@ -86,4 +86,20 @@ export const configAPI = {
   getGeoapifyKey: () => api.get('/config/geoapify'),
 };
 
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getUsers: (search, role) => api.get('/admin/users', { params: { search, role } }),
+  updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  getAvailabilities: (status) => api.get('/admin/availabilities', { params: { status } }),
+  cancelAvailability: (id) => api.delete(`/admin/availabilities/${id}`),
+  getMatches: () => api.get('/admin/matches'),
+  updateMatchStatus: (id, status) => api.put(`/admin/matches/${id}/status`, null, { params: { status } }),
+  getColleges: () => api.get('/admin/colleges'),
+  addCollege: (data) => api.post('/admin/colleges', data),
+  deleteCollege: (id) => api.delete(`/admin/colleges/${id}`),
+  getAuditLogs: () => api.get('/admin/audit-logs'),
+};
+
 export default api;
+

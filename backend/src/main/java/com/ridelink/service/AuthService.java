@@ -56,13 +56,13 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest request) {
-        String email = request.getEmail().trim().toLowerCase();
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, request.getPassword())
-        );
+        String input = request.getEmail().trim().toLowerCase();
+        User user = userRepository.findByIdentifier(input)
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), request.getPassword())
+        );
 
         String token = tokenProvider.generateToken(user.getId(), user.getEmail());
         String refreshToken = tokenProvider.generateRefreshToken(user.getId());

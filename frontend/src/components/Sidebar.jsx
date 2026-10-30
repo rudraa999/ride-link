@@ -1,13 +1,21 @@
 import React from 'react';
-import { Home, MessageSquare, Clock, User, Settings, X } from 'lucide-react';
+import { Home, MessageSquare, Clock, User, Settings, X, Shield } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ROLE_ADMIN';
+
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'chats', label: 'Chats', icon: MessageSquare },
     { id: 'history', label: 'History', icon: Clock },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
+
+  if (isAdmin) {
+    navItems.push({ id: 'admin', label: 'Admin Panel', icon: Shield, badge: 'PRO' });
+  }
 
   const handleSelectTab = (id) => {
     setActiveTab(id);
@@ -72,7 +80,12 @@ export default function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobile
                   }`}
                 >
                   <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge && (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-black tracking-wider uppercase bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
+                      {item.badge}
+                    </span>
+                  )}
                 </button>
               );
             })}

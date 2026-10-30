@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, ChevronDown, LogOut, User as UserIcon, Menu } from 'lucide-react';
+import { Bell, ChevronDown, LogOut, User as UserIcon, Menu, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 
@@ -94,6 +94,11 @@ export default function Header({ title, subtitle, setActiveTab, onOpenMobileSide
               </div>
             )}
             <span className="hidden sm:inline text-sm font-semibold text-slate-800">{firstName}</span>
+            {user?.role === 'ROLE_ADMIN' && (
+              <span className="hidden sm:inline px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-700 border border-indigo-200">
+                Admin
+              </span>
+            )}
             <ChevronDown className="w-4 h-4 text-slate-400" />
           </button>
 
@@ -104,6 +109,18 @@ export default function Header({ title, subtitle, setActiveTab, onOpenMobileSide
                 <p className="text-xs font-medium text-slate-400">Signed in as</p>
                 <p className="text-sm font-semibold text-slate-800 truncate">{user?.email}</p>
               </div>
+              {user?.role === 'ROLE_ADMIN' && (
+                <button
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    if (setActiveTab) setActiveTab('admin');
+                  }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 font-bold transition-colors cursor-pointer border-b border-slate-100"
+                >
+                  <Shield className="w-4 h-4 text-indigo-600" />
+                  Admin Console
+                </button>
+              )}
               <button
                 onClick={() => {
                   setDropdownOpen(false);

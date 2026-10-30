@@ -426,7 +426,8 @@ export default function ProfileSettings({ setActiveTab, onOpenMobileSidebar }) {
                 onClick={logout}
                 className="w-full sm:w-auto px-8 py-3.5 bg-[#ef4444] hover:bg-red-600 active:scale-95 text-white font-bold rounded-2xl text-sm shadow-md shadow-red-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>&gt; Logout</span>
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
               </button>
             </div>
           </div>

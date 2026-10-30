@@ -78,18 +78,18 @@ export default function Login({ onNavigateToSignup }) {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email */}
+              {/* Email / Username */}
               <div>
-                <label className="block text-sm font-bold text-slate-800 mb-1.5">Email</label>
+                <label className="block text-sm font-bold text-slate-800 mb-1.5">Email or Username</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                     <Mail className="w-5 h-5" />
                   </div>
                   <input
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="student@college.edu"
+                    placeholder="student@college.edu or admin"
                     className="w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm font-medium focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-colors"
                     required
                   />
