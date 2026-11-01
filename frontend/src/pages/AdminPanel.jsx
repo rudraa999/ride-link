@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {
   Shield, Users, Car, MapPin, Activity, CheckCircle2, AlertTriangle,
   Trash2, Plus, Search, RefreshCw, Clock, Building, X,
-  ArrowUpRight, MessageSquare, ChevronRight, Menu, Sparkles
+  ArrowUpRight, MessageSquare, Menu
 } from 'lucide-react';
 import { adminAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
 
 export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
-  const { user } = useAuth();
   const [currentSection, setCurrentSection] = useState('overview'); // 'overview' | 'users' | 'availabilities' | 'matches' | 'colleges' | 'audit'
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -149,20 +147,6 @@ export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
     }
   };
 
-  // Role toggle
-  const handleToggleRole = async (targetUser) => {
-    const newRole = targetUser.role === 'ROLE_ADMIN' ? 'ROLE_USER' : 'ROLE_ADMIN';
-    try {
-      await adminAPI.updateUserRole(targetUser.id, newRole);
-      showToast(`User ${targetUser.fullName} role changed to ${newRole}`);
-      fetchUsers();
-      fetchStats();
-    } catch (err) {
-      console.error(err);
-      showToast('Failed to update role', 'error');
-    }
-  };
-
   // Delete User
   const handleDeleteUser = async () => {
     if (!deleteConfirmUser) return;
@@ -256,7 +240,7 @@ export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-extrabold tracking-tight text-white">RideLink Admin Central</h1>
+                <h1 className="text-lg font-extrabold tracking-tight text-white">RideLink Admin</h1>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                   PRO CONSOLE
                 </span>
@@ -460,84 +444,36 @@ export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
                   </div>
                 </div>
 
-                {/* College Breakdown & Fast Actions */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left: College User Distribution */}
-                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 className="text-base font-extrabold text-slate-900">Campus Distribution</h2>
-                        <p className="text-xs text-slate-500">Registered student community by campus</p>
-                      </div>
-                      <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">
-                        {Object.keys(stats.usersByCollege || {}).length} Colleges Active
-                      </span>
+                {/* Campus User Distribution */}
+                <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-base font-extrabold text-slate-900">Campus Distribution</h2>
+                      <p className="text-xs text-slate-500">Registered student community by campus</p>
                     </div>
-
-                    <div className="space-y-3 mt-4">
-                      {Object.entries(stats.usersByCollege || {}).map(([collegeName, count]) => {
-                        const pct = stats.totalUsers > 0 ? Math.round((count / stats.totalUsers) * 100) : 0;
-                        return (
-                          <div key={collegeName} className="space-y-1">
-                            <div className="flex justify-between text-xs font-bold text-slate-700">
-                              <span className="truncate max-w-sm">{collegeName}</span>
-                              <span className="text-slate-500">{count} students ({pct}%)</span>
-                            </div>
-                            <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500"
-                                style={{ width: `${Math.max(pct, 5)}%` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">
+                      {Object.keys(stats.usersByCollege || {}).length} Colleges Active
+                    </span>
                   </div>
 
-                  {/* Right: Quick Admin Controls */}
-                  <div className="bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between">
-                    <div>
-                      <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center mb-4">
-                        <Sparkles className="w-5 h-5 text-indigo-300" />
-                      </div>
-                      <h3 className="text-lg font-extrabold text-white">Administrator Hub</h3>
-                      <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                        Control student access, inspect real-time ride broadcasts, modify ride match statuses, and expand participating campus databases.
-                      </p>
-
-                      <div className="mt-5 space-y-2">
-                        <button
-                          onClick={() => setCurrentSection('users')}
-                          className="w-full py-2.5 px-3 bg-white/10 hover:bg-white/15 active:scale-95 text-xs font-bold text-white rounded-xl flex items-center justify-between cursor-pointer transition-colors"
-                        >
-                          <span>Manage User Roles</span>
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setCurrentSection('colleges');
-                            setAddCollegeOpen(true);
-                          }}
-                          className="w-full py-2.5 px-3 bg-white/10 hover:bg-white/15 active:scale-95 text-xs font-bold text-white rounded-xl flex items-center justify-between cursor-pointer transition-colors"
-                        >
-                          <span>Add New College</span>
-                          <Plus className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => setCurrentSection('availabilities')}
-                          className="w-full py-2.5 px-3 bg-white/10 hover:bg-white/15 active:scale-95 text-xs font-bold text-white rounded-xl flex items-center justify-between cursor-pointer transition-colors"
-                        >
-                          <span>Inspect Live Broadcasts</span>
-                          <Car className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-white/10 mt-6 flex items-center justify-between text-[11px] text-slate-400">
-                      <span>Logged in as: <strong className="text-white">{user?.email}</strong></span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">PRO</span>
-                    </div>
+                  <div className="space-y-3 mt-4">
+                    {Object.entries(stats.usersByCollege || {}).map(([collegeName, count]) => {
+                      const pct = stats.totalUsers > 0 ? Math.round((count / stats.totalUsers) * 100) : 0;
+                      return (
+                        <div key={collegeName} className="space-y-1">
+                          <div className="flex justify-between text-xs font-bold text-slate-700">
+                            <span className="truncate max-w-md">{collegeName}</span>
+                            <span className="text-slate-500">{count} students ({pct}%)</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500"
+                              style={{ width: `${Math.max(pct, 5)}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -632,24 +568,17 @@ export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
                                   <span className="font-mono text-slate-700">{u.phone || '—'}</span>
                                 </td>
                                 <td className="py-3.5 px-4">
-                                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center gap-1 ${
-                                    isAdmin
+                                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center gap
+                                    -1 ${isAdmin
                                       ? 'bg-purple-100 text-purple-700 border border-purple-200'
                                       : 'bg-blue-100 text-blue-700 border border-blue-200'
-                                  }`}>
+                                    }`}>
                                     {isAdmin ? <Shield className="w-3 h-3" /> : <Users className="w-3 h-3" />}
                                     {isAdmin ? 'ADMIN' : 'STUDENT'}
                                   </span>
                                 </td>
                                 <td className="py-3.5 px-4 text-right">
-                                  <div className="flex items-center justify-end gap-2">
-                                    <button
-                                      onClick={() => handleToggleRole(u)}
-                                      title={isAdmin ? "Demote to Student" : "Promote to Admin"}
-                                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer transition-colors"
-                                    >
-                                      {isAdmin ? 'Demote' : 'Promote'}
-                                    </button>
+                                  <div className="flex items-center justify-end">
                                     <button
                                       onClick={() => setDeleteConfirmUser(u)}
                                       title="Delete user"
@@ -681,17 +610,17 @@ export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => { setAvailStatusFilter('ALL'); fetchAvailabilities(); }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${
-                        availStatusFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
-                      }`}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-point
+                        er ${availStatusFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}
                     >
                       All Broadcasts
                     </button>
                     <button
                       onClick={() => { setAvailStatusFilter('ACTIVE'); fetchAvailabilities(); }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${
-                        availStatusFilter === 'ACTIVE' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
-                      }`}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-point
+                        er ${availStatusFilter === 'ACTIVE' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}
                     >
                       Active Only
                     </button>
@@ -708,9 +637,9 @@ export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
                       <div key={avail.id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
                         <div>
                           <div className="flex items-center justify-between mb-3">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                              avail.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                            }`}>
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wid
+                              er ${avail.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                              }`}>
                               {avail.active ? 'Active' : 'Expired/Done'}
                             </span>
                             <span className="text-xs font-bold text-indigo-600">ID #{avail.id}</span>
@@ -806,13 +735,13 @@ export default function AdminPanel({ setActiveTab, onOpenMobileSidebar }) {
                                 <p className="text-[11px] text-slate-500">→ {m.destinationName}</p>
                               </td>
                               <td className="py-3.5 px-4">
-                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                                  m.status === 'ACTIVE'
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wid
+                                  er ${m.status === 'ACTIVE'
                                     ? 'bg-indigo-100 text-indigo-700'
                                     : m.status === 'COMPLETED'
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-slate-100 text-slate-600'
-                                }`}>
+                                      ? 'bg-emerald-100 text-emerald-700'
+                                      : 'bg-slate-100 text-slate-600'
+                                  }`}>
                                   {m.status}
                                 </span>
                               </td>
